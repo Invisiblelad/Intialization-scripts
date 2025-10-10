@@ -10,8 +10,12 @@ systemctl enable docker
 systemctl start docker
 
 # Add Kubernetes apt repository
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
-echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list
+# curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+# echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list
+
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.33/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.33/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
 
 # Install kubelet, kubeadm, kubectl
 apt-get update -y
@@ -35,3 +39,9 @@ chown $(id -u):$(id -g) $HOME/.kube/config
 
 # Install Flannel CNI plugin
 kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+
+# if the pods fails due to mode probe
+
+# lsmod | grep br_netfilter
+# sudo modprobe br_netfilter
+# sudo mkdir -p /proc/sys/net/bridge
